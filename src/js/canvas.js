@@ -13,6 +13,9 @@ const mouse = {
 
 const colors = ['#2185C5', '#7ECEFD', '#FFF6E5', '#FF7F66']
 
+var gravity = 1;
+var friction = 0.9;
+
 // Event Listeners
 addEventListener('mousemove', (event) => {
   mouse.x = event.clientX
@@ -27,10 +30,11 @@ addEventListener('resize', () => {
 })
 
 // Objects
-class Object {
-  constructor(x, y, radius, color) {
+class Ball {
+  constructor(x, y, dy, radius, color) {
     this.x = x
     this.y = y
+    this.dy = dy
     this.radius = radius
     this.color = color
   }
@@ -44,16 +48,26 @@ class Object {
   }
 
   update() {
+    if(this.y + this.radius > canvas.height/2 + 350){
+      this.dy = -this.dy * friction;
+    } else{
+      this.dy += gravity;      
+    }
+    this.y += this.dy;
     this.draw()
   }
 }
 
 // Implementation
-let objects
+let balls
+var ball;
 function init() {
-  objects = []
 
-  for (let i = 0; i < 400; i++) {
+  ball = new Ball(canvas.width/2,canvas.height/2,2,30,'#fff')
+
+  balls = []
+
+  for (let i = 0; i < 15; i++) {
     // objects.push()
   }
 }
@@ -63,7 +77,7 @@ function animate() {
   requestAnimationFrame(animate)
   c.clearRect(0, 0, canvas.width, canvas.height)
 
-  c.fillText('HTML CANVAS BOILERPLATE', mouse.x, mouse.y)
+  ball.update();
   // objects.forEach(object => {
   //  object.update()
   // })
