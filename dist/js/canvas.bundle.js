@@ -114,7 +114,7 @@ var mouse = {
 };
 var colors = ['#2185C5', '#7ECEFD', '#FFF6E5', '#FF7F66'];
 var gravity = 1;
-var friction = 0.9; // Event Listeners
+var friction = 0.8; // Event Listeners
 
 addEventListener('mousemove', function (event) {
   mouse.x = event.clientX;
@@ -127,12 +127,13 @@ addEventListener('resize', function () {
 }); // Objects
 
 var Ball = /*#__PURE__*/function () {
-  function Ball(x, y, dy, radius, color) {
+  function Ball(x, y, dx, dy, radius, color) {
     _classCallCheck(this, Ball);
 
     this.x = x;
     this.y = y;
     this.dy = dy;
+    this.dx = dx;
     this.radius = radius;
     this.color = color;
   }
@@ -144,18 +145,24 @@ var Ball = /*#__PURE__*/function () {
       c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
       c.fillStyle = this.color;
       c.fill();
+      c.stroke();
       c.closePath();
     }
   }, {
     key: "update",
     value: function update() {
-      if (this.y + this.radius > canvas.height / 2 + 350) {
+      if (this.y + this.radius + this.dy > canvas.height) {
         this.dy = -this.dy * friction;
       } else {
         this.dy += gravity;
       }
 
+      if (this.x + this.radius + this.dx > canvas.width || this.x + this.radius + this.dx < 0 + this.radius * 2) {
+        this.dx = -this.dx * friction;
+      }
+
       this.y += this.dy;
+      this.x += this.dx;
       this.draw();
     }
   }]);
@@ -164,28 +171,45 @@ var Ball = /*#__PURE__*/function () {
 }(); // Implementation
 
 
-var balls;
-var ball;
+var balls; //var ball;
 
 function init() {
-  ball = new Ball(canvas.width / 2, canvas.height / 2, 2, 30, '#fff');
+  //ball = new Ball(canvas.width/2,canvas.height/2,2,30,'#fff',1)
   balls = [];
 
-  for (var i = 0; i < 15; i++) {// objects.push()
+  for (var i = 0; i < 50; i++) {
+    var radius = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["randomIntFromRange"])(15, 50);
+    var x = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["randomIntFromRange"])(radius, canvas.width - radius);
+    var y = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["randomIntFromRange"])(radius, canvas.height - radius); //friction = randomIntFromRange(0.1,5);
+
+    var dx = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["randomIntFromRange"])(-2, 2);
+    var r = Math.random() * 255;
+    var g = Math.random() * 255;
+    var b = Math.random() * 255;
+    var col = "rgba(".concat(r, ",").concat(g, ",").concat(b, ",1)");
+    var color = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["randomColor"])(colors); // balls.push(new Ball(x,y,dx,friction,radius,col))
+
+    balls.push(new Ball(x, y, dx, friction, radius, color));
   }
+
+  console.log(balls);
 } // Animation Loop
 
 
 function animate() {
   requestAnimationFrame(animate);
-  c.clearRect(0, 0, canvas.width, canvas.height);
-  ball.update(); // objects.forEach(object => {
-  //  object.update()
-  // })
+  c.clearRect(0, 0, canvas.width, canvas.height); //ball.update();
+
+  balls.forEach(function (ball) {
+    ball.update();
+  });
 }
 
 init();
 animate();
+addEventListener("click", function () {
+  init();
+});
 
 /***/ }),
 
